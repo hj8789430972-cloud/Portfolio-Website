@@ -10,24 +10,123 @@ import {
   CylinderCollider,
   RapierRigidBody,
 } from "@react-three/rapier";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const textureLoader = new THREE.TextureLoader();
-const imageUrls = [
-  "/images/react2.webp",
-  "/images/next2.webp",
-  "/images/node2.webp",
-  "/images/express.webp",
-  "/images/mongo.webp",
-  "/images/mysql.webp",
-  "/images/typescript.webp",
-  "/images/javascript.webp",
+interface SkillItem {
+  title: string;
+  category: string;
+  color: string;
+}
+
+const skillItems: SkillItem[] = [
+  { title: "Python", category: "Language", color: "#38bdf8" },
+  { title: "C", category: "Language", color: "#60a5fa" },
+  { title: "C++", category: "Language", color: "#818cf8" },
+  { title: "DSA", category: "Language", color: "#c084fc" },
+  { title: "HTML", category: "Technology", color: "#f97316" },
+  { title: "CSS", category: "Technology", color: "#38bdf8" },
+  { title: "JavaScript", category: "Technology", color: "#facc15" },
+  { title: "MySQL", category: "Database", color: "#06b6d4" },
+  { title: "MongoDB", category: "Database", color: "#10b981" },
+  { title: "DBMS", category: "Database", color: "#2dd4bf" },
+  { title: "Problem Solving", category: "Soft Skill", color: "#ec4899" },
+  { title: "Time Management", category: "Soft Skill", color: "#f43f5e" },
+  { title: "Adaptability", category: "Soft Skill", color: "#a855f7" },
 ];
-const textures = imageUrls.map((url) => textureLoader.load(url));
+
+function createSkillTexture(
+  title: string,
+  category: string,
+  accentColor: string
+): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+
+  if (ctx) {
+    // Background radial gradient
+    const gradient = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      20,
+      size / 2,
+      size / 2,
+      size / 2
+    );
+    gradient.addColorStop(0, "#1c1033");
+    gradient.addColorStop(0.7, "#0e071c");
+    gradient.addColorStop(1, "#05020a");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    // Glowing outer circle border
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 14;
+    ctx.shadowColor = accentColor;
+    ctx.shadowBlur = 30;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 30, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner subtle ring
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 50, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Category tag
+    ctx.fillStyle = accentColor;
+    ctx.font =
+      "bold 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = accentColor;
+    ctx.shadowBlur = 12;
+    ctx.fillText(category.toUpperCase(), size / 2, size / 2 - 80);
+
+    // Main skill title text
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+    ctx.shadowBlur = 20;
+
+    const words = title.split(" ");
+    if (words.length === 1) {
+      ctx.font =
+        "900 68px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText(title, size / 2, size / 2 + 10);
+    } else if (words.length === 2) {
+      ctx.font =
+        "bold 46px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText(words[0], size / 2, size / 2 - 10);
+      ctx.fillText(words[1], size / 2, size / 2 + 45);
+    } else {
+      ctx.font =
+        "bold 36px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText(words.slice(0, 2).join(" "), size / 2, size / 2 - 15);
+      ctx.fillText(words.slice(2).join(" "), size / 2, size / 2 + 35);
+    }
+
+    // Bottom accent indicator bar
+    ctx.fillStyle = accentColor;
+    ctx.shadowColor = accentColor;
+    ctx.shadowBlur = 10;
+    ctx.fillRect(size / 2 - 40, size / 2 + 95, 80, 8);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  return texture;
+}
 
 const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
 
-const spheres = [...Array(30)].map(() => ({
-  scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
+const spheres = [...Array(28)].map(() => ({
+  scale: [0.75, 0.95, 0.85, 1, 0.9][Math.floor(Math.random() * 5)],
 }));
 
 type SphereProps = {
@@ -128,47 +227,74 @@ const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
+    // Refresh ScrollTrigger so pin spacer distances are accurate
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 300);
+
     const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
-      setIsActive(scrollY > threshold);
+      const elem = document.getElementById("techstack");
+      if (elem) {
+        const rect = elem.getBoundingClientRect();
+        setIsActive(rect.top < window.innerHeight && rect.bottom > 0);
+      }
     };
     document.querySelectorAll(".header a").forEach((elem) => {
       const element = elem as HTMLAnchorElement;
       element.addEventListener("click", () => {
         const interval = setInterval(() => {
           handleScroll();
-        }, 10);
+        }, 20);
         setTimeout(() => {
           clearInterval(interval);
-        }, 1000);
+        }, 1200);
       });
     });
     window.addEventListener("scroll", handleScroll);
+    handleScroll();
     return () => {
+      clearTimeout(refreshTimer);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
   const materials = useMemo(() => {
-    return textures.map(
-      (texture) =>
-        new THREE.MeshPhysicalMaterial({
-          map: texture,
-          emissive: "#ffffff",
-          emissiveMap: texture,
-          emissiveIntensity: 0.3,
-          metalness: 0.5,
-          roughness: 1,
-          clearcoat: 0.1,
-        })
-    );
+    return skillItems.map((skill) => {
+      const texture = createSkillTexture(
+        skill.title,
+        skill.category,
+        skill.color
+      );
+      return new THREE.MeshPhysicalMaterial({
+        map: texture,
+        emissive: "#ffffff",
+        emissiveMap: texture,
+        emissiveIntensity: 0.25,
+        metalness: 0.4,
+        roughness: 0.8,
+        clearcoat: 0.1,
+      });
+    });
   }, []);
 
   return (
-    <div className="techstack">
-      <h2> My Techstack</h2>
+    <div className="techstack" id="techstack">
+      <h2>My Techstack</h2>
+
+      <div className="techstack-categories">
+        <div className="tech-cat-pill">
+          <strong>Languages:</strong> Python, C, C++, DSA
+        </div>
+        <div className="tech-cat-pill">
+          <strong>Technologies:</strong> HTML, CSS, JavaScript
+        </div>
+        <div className="tech-cat-pill">
+          <strong>Databases/Tools:</strong> MySQL, MongoDB, DBMS
+        </div>
+        <div className="tech-cat-pill">
+          <strong>Soft Skills:</strong> Problem Solving, Time Management, Adaptability
+        </div>
+      </div>
 
       <Canvas
         shadows
@@ -193,7 +319,7 @@ const TechStack = () => {
             <SphereGeo
               key={i}
               {...props}
-              material={materials[Math.floor(Math.random() * materials.length)]}
+              material={materials[i % materials.length]}
               isActive={isActive}
             />
           ))}

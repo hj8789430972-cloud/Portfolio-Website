@@ -6,9 +6,10 @@ const About = () => {
       <div className="about-me">
         <h3 className="title">About Me</h3>
         <p className="para">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic quis
-          dolores numquam iusto Ratione earum ducimus autem id iure pariatur
-          dolorum quae maiores.
+          I am Harsh Kumar Jaiswal, an AI & ML Computer Science student at
+          Lovely Professional University. I build intelligent systems,
+          embedded IoT architectures, and robust software with 200+ solved
+          algorithmic challenges.
         </p>
       </div>
     </div>
