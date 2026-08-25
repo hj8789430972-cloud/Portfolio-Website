@@ -55,28 +55,28 @@ const Work = () => {
   useGSAP(() => {
     const calculateDistance = () => {
       const workFlex = document.querySelector(".work-flex") as HTMLElement;
-      if (!workFlex) return 2500;
-      const totalWidth = workFlex.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      return Math.max(totalWidth - viewportWidth + 200, 2000);
+      if (!workFlex) return 1000;
+      const parent = workFlex.parentElement;
+      if (!parent) return 1000;
+      const distance = workFlex.scrollWidth - parent.clientWidth + 60;
+      return Math.max(distance, 100);
     };
-
-    const getDistance = () => calculateDistance();
 
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: ".work-section",
         start: "top top",
-        end: () => `+=${getDistance()}`,
+        end: () => `+=${calculateDistance()}`,
         scrub: 1,
         pin: true,
         id: "work",
         invalidateOnRefresh: true,
+        anticipatePin: 1,
       },
     });
 
     timeline.to(".work-flex", {
-      x: () => -getDistance(),
+      x: () => -calculateDistance(),
       ease: "none",
     });
 
