@@ -11,6 +11,7 @@ import {
   RapierRigidBody,
 } from "@react-three/rapier";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import "./styles/TechStack.css";
 
 interface SkillItem {
   title: string;
@@ -125,8 +126,8 @@ function createSkillTexture(
 
 const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
 
-const spheres = [...Array(28)].map(() => ({
-  scale: [0.75, 0.95, 0.85, 1, 0.9][Math.floor(Math.random() * 5)],
+const spheres = [...Array(24)].map(() => ({
+  scale: [0.7, 0.85, 0.8, 0.9, 0.75][Math.floor(Math.random() * 5)],
 }));
 
 type SphereProps = {
@@ -135,6 +136,7 @@ type SphereProps = {
   r?: typeof THREE.MathUtils.randFloatSpread;
   material: THREE.MeshPhysicalMaterial;
   isActive: boolean;
+  targetY?: number;
 };
 
 function SphereGeo({
@@ -143,32 +145,37 @@ function SphereGeo({
   r = THREE.MathUtils.randFloatSpread,
   material,
   isActive,
+  targetY = -4,
 }: SphereProps) {
   const api = useRef<RapierRigidBody | null>(null);
 
   useFrame((_state, delta) => {
-    if (!isActive) return;
-    delta = Math.min(0.1, delta);
+    if (!isActive || !api.current) return;
+    delta = Math.min(0.08, delta);
+
+    const pos = api.current.translation();
+    // Attract towards lower ambient center so spheres don't block upper text
+    const target = new THREE.Vector3(0, targetY, 0);
     const impulse = vec
-      .copy(api.current!.translation())
+      .set(pos.x - target.x, pos.y - target.y, pos.z - target.z)
       .normalize()
       .multiply(
         new THREE.Vector3(
-          -50 * delta * scale,
-          -150 * delta * scale,
-          -50 * delta * scale
+          -45 * delta * scale,
+          -120 * delta * scale,
+          -45 * delta * scale
         )
       );
 
-    api.current?.applyImpulse(impulse, true);
+    api.current.applyImpulse(impulse, true);
   });
 
   return (
     <RigidBody
-      linearDamping={0.75}
-      angularDamping={0.15}
+      linearDamping={0.8}
+      angularDamping={0.2}
       friction={0.2}
-      position={[r(20), r(20) - 25, r(20) - 10]}
+      position={[r(16), r(12) - 20, r(14) - 6]}
       ref={api}
       colliders={false}
     >
@@ -199,7 +206,7 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
   const ref = useRef<RapierRigidBody>(null);
 
   useFrame(({ pointer, viewport }) => {
-    if (!isActive) return;
+    if (!isActive || !ref.current) return;
     const targetVec = vec.lerp(
       new THREE.Vector3(
         (pointer.x * viewport.width) / 2,
@@ -208,7 +215,7 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
       ),
       0.2
     );
-    ref.current?.setNextKinematicTranslation(targetVec);
+    ref.current.setNextKinematicTranslation(targetVec);
   });
 
   return (
@@ -218,16 +225,23 @@ function Pointer({ vec = new THREE.Vector3(), isActive }: PointerProps) {
       colliders={false}
       ref={ref}
     >
-      <BallCollider args={[2]} />
+      <BallCollider args={[2.2]} />
     </RigidBody>
   );
 }
 
 const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
 
   useEffect(() => {
-    // Refresh ScrollTrigger so pin spacer distances are accurate
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+
     const refreshTimer = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 300);
@@ -239,6 +253,7 @@ const TechStack = () => {
         setIsActive(rect.top < window.innerHeight && rect.bottom > 0);
       }
     };
+
     document.querySelectorAll(".header a").forEach((elem) => {
       const element = elem as HTMLAnchorElement;
       element.addEventListener("click", () => {
@@ -250,10 +265,13 @@ const TechStack = () => {
         }, 1200);
       });
     });
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
+
     return () => {
       clearTimeout(refreshTimer);
+      window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -278,36 +296,72 @@ const TechStack = () => {
   }, []);
 
   return (
-    <div className="techstack" id="techstack">
-      <h2>My Techstack</h2>
+    <div className="techstack-section" id="techstack">
+      {/* Content Container with Clear Hierarchy & Breathing Room */}
+      <div className="techstack-container">
+        {/* 1. Primary Section: Tech Stack */}
+        <div className="techstack-header-group">
+          <h2 className="techstack-title">Tech Stack</h2>
+          <div className="techstack-grid">
+            <div className="tech-group">
+              <span className="tech-group-title">Languages</span>
+              <div className="tech-pills">
+                <span className="tech-pill lang">Python</span>
+                <span className="tech-pill lang">C</span>
+                <span className="tech-pill lang">C++</span>
+                <span className="tech-pill lang">DSA</span>
+              </div>
+            </div>
 
-      <div className="techstack-categories">
-        <div className="tech-cat-pill">
-          <strong>Languages:</strong> Python, C, C++, DSA
+            <div className="tech-group">
+              <span className="tech-group-title">Technologies</span>
+              <div className="tech-pills">
+                <span className="tech-pill tech">HTML</span>
+                <span className="tech-pill tech">CSS</span>
+                <span className="tech-pill tech">JavaScript</span>
+              </div>
+            </div>
+
+            <div className="tech-group">
+              <span className="tech-group-title">Databases & Tools</span>
+              <div className="tech-pills">
+                <span className="tech-pill db">MySQL</span>
+                <span className="tech-pill db">MongoDB</span>
+                <span className="tech-pill db">DBMS</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="tech-cat-pill">
-          <strong>Technologies:</strong> HTML, CSS, JavaScript
-        </div>
-        <div className="tech-cat-pill">
-          <strong>Databases/Tools:</strong> MySQL, MongoDB, DBMS
-        </div>
-        <div className="tech-cat-pill">
-          <strong>Soft Skills:</strong> Problem Solving, Time Management, Adaptability
+
+        {/* 2. Subsection: Soft Skills (Distinct & Clearly Positioned Below) */}
+        <div className="softskills-group">
+          <h3 className="softskills-title">Soft Skills</h3>
+          <div className="softskills-pills">
+            <span className="soft-pill">Problem Solving</span>
+            <span className="soft-pill">Time Management</span>
+            <span className="soft-pill">Adaptability</span>
+          </div>
         </div>
       </div>
 
+      {/* 3. Interactive 3D Physics Spheres (Ambient Background/Decoration) */}
       <Canvas
         shadows
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
-        camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
-        onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
+        camera={{
+          position: [0, 0, isMobile ? 24 : 20],
+          fov: isMobile ? 38 : 32,
+          near: 1,
+          far: 100,
+        }}
+        onCreated={(state) => (state.gl.toneMappingExposure = 1.4)}
         className="tech-canvas"
       >
-        <ambientLight intensity={1} />
+        <ambientLight intensity={1.2} />
         <spotLight
           position={[20, 20, 25]}
           penumbra={1}
-          angle={0.2}
+          angle={0.25}
           color="white"
           castShadow
           shadow-mapSize={[512, 512]}
@@ -321,6 +375,7 @@ const TechStack = () => {
               {...props}
               material={materials[i % materials.length]}
               isActive={isActive}
+              targetY={isMobile ? -2.5 : -4.5}
             />
           ))}
         </Physics>

@@ -42,7 +42,22 @@
 }
 a.contact-social {
   font-size: 25px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #eae5ec;
+  text-decoration: none;
+  margin-bottom: 14px;
+  padding-bottom: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer !important;
+  pointer-events: auto;
+}
+a.contact-social:hover {
+  color: var(--accentColor, #c481ff);
+  border-bottom-color: var(--accentColor, #c481ff);
+  transform: translateX(6px);
 }
 .contact-box h2 {
   font-weight: 400;
@@ -86,21 +101,30 @@ a.contact-social {
   }
 }
 @media only screen and (max-width: 900px) {
+  .contact-section {
+    min-height: 100vh;
+    padding: 80px 0px 60px 0px;
+  }
+  .contact-section h3 {
+    font-size: clamp(32px, 8vw, 44px);
+    margin-bottom: 30px;
+  }
   .contact-flex {
     flex-direction: column;
-    gap: 40px;
+    gap: 30px;
   }
   .contact-flex p {
-    margin-bottom: 0px;
+    margin-bottom: 10px;
+    font-size: 16px;
   }
   .contact-flex h4 {
-    margin-top: 20px;
+    margin-top: 10px;
+    font-size: 14px;
   }
-  .contact-section {
-    margin-top: 50px;
-    padding-bottom: 50px;
+  a.contact-social {
+    font-size: 20px;
   }
   .contact-container {
-    width: calc(100% - 25px);
+    width: 100%;
   }
 }

@@ -3,49 +3,57 @@
   max-width: var(--cMaxWidth);
   width: var(--cWidth);
   bottom: 0;
-  z-index: 99;
+  z-index: 9999;
   left: 50%;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 .social-icons {
   position: absolute;
-  left: -20px;
-  bottom: 20px;
-  display: none;
+  left: 0;
+  bottom: 25px;
+  display: flex;
   flex-direction: column;
-  gap: 8px;
-  z-index: 999;
-  padding: 10px;
-}
-.social-icons:hover {
-  transition: 0.3s;
-  color: var(--backgroundColor);
-}
-.social-icons a:hover {
-  color: var(--backgroundColor);
-  /* transform: scale(1.2); */
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: auto;
 }
 .social-icons span {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .social-icons a {
-  --siLeft: 50%;
-  --siTop: 50%;
-  position: absolute;
-  left: var(--siLeft, 50%);
-  top: var(--siTop, 50%);
-  transform: translate(-50%, -50%);
   display: flex;
-  font-size: 23px;
-  will-change: left, top;
-  transition: transform 0.3s ease-out;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  color: #eae5ec;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+  cursor: pointer !important;
+  pointer-events: auto;
+  text-decoration: none;
+}
+.social-icons a:hover {
+  color: #ffffff;
+  background: var(--accentColor, #9333ea);
+  border-color: var(--accentColor, #9333ea);
+  transform: scale(1.15) translateX(4px);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
 }
 .resume-button {
   position: absolute;
-  z-index: 99;
+  z-index: 9999;
   display: flex;
   gap: 5px;
   bottom: 40px;
@@ -56,9 +64,10 @@
   font-size: 15px;
   line-height: 15px;
   font-weight: 600;
-  color: #5e5e5e;
-  cursor: pointer;
-  transition: 0.5s;
+  color: #888;
+  cursor: pointer !important;
+  pointer-events: auto;
+  transition: 0.3s;
   transform-origin: left bottom;
   transform: translateX(100%) rotateZ(-90deg);
 }
@@ -72,32 +81,45 @@ div.resume-button span {
   display: flex;
   align-items: center;
 }
-.check-line {
-  position: fixed;
-  top: 655px;
-  left: 0;
-  height: 1px;
-  background-color: #ffffff;
-  width: 100%;
-  z-index: 99999;
-}
-@media only screen and (min-width: 900px) {
+@media only screen and (max-width: 768px) {
   .social-icons {
-    display: flex;
-    gap: 20px;
+    bottom: 15px;
+    left: 0;
+    gap: 8px;
+  }
+  .social-icons span {
+    width: 36px;
+    height: 36px;
   }
   .social-icons a {
-    font-size: 28px;
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+  .resume-button {
+    bottom: 25px;
+    right: 0;
+    font-size: 13px;
+    letter-spacing: 2px;
   }
 }
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 769px) {
+  .social-icons {
+    display: flex;
+    gap: 14px;
+  }
+  .social-icons a {
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+  }
   .resume-button {
     transform: none;
-    font-size: 20px;
-    line-height: 20px;
+    font-size: 18px;
+    line-height: 18px;
   }
   div.resume-button span {
-    font-size: 23px;
+    font-size: 20px;
     margin-top: -1.5px;
   }
 }
