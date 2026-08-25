@@ -246,33 +246,27 @@ const TechStack = () => {
       ScrollTrigger.refresh();
     }, 300);
 
-    const handleScroll = () => {
-      const elem = document.getElementById("techstack");
-      if (elem) {
-        const rect = elem.getBoundingClientRect();
-        setIsActive(rect.top < window.innerHeight && rect.bottom > 0);
-      }
-    };
-
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 20);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1200);
-      });
-    });
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
+    const elem = document.getElementById("techstack");
+    let observer: IntersectionObserver | null = null;
+    if (elem) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            setIsActive(entry.isIntersecting);
+          });
+        },
+        { rootMargin: "150px 0px" }
+      );
+      observer.observe(elem);
+    }
 
     return () => {
       clearTimeout(refreshTimer);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll);
+      if (observer && elem) {
+        observer.unobserve(elem);
+        observer.disconnect();
+      }
     };
   }, []);
 

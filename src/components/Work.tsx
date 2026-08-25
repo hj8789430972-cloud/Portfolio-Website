@@ -55,11 +55,17 @@ const Work = () => {
   useGSAP(() => {
     const calculateDistance = () => {
       const workFlex = document.querySelector(".work-flex") as HTMLElement;
-      if (!workFlex) return 1000;
+      if (!workFlex) return 0;
       const parent = workFlex.parentElement;
-      if (!parent) return 1000;
-      const distance = workFlex.scrollWidth - parent.clientWidth + 60;
-      return Math.max(distance, 100);
+      if (!parent) return 0;
+      const boxes = workFlex.querySelectorAll<HTMLElement>(".work-box");
+      if (boxes.length === 0) return 0;
+      const lastBox = boxes[boxes.length - 1];
+      const totalWidth = lastBox.offsetLeft + lastBox.offsetWidth;
+      const visibleWidth = parent.clientWidth;
+      const padding = window.innerWidth <= 768 ? 20 : 60;
+      const distance = totalWidth - visibleWidth + padding;
+      return Math.max(distance, 0);
     };
 
     const timeline = gsap.timeline({
@@ -80,7 +86,7 @@ const Work = () => {
       ease: "none",
     });
 
-    // Ensure ScrollTrigger recalculates pin spacers accurately
+    // Ensure ScrollTrigger recalculates pin spacers accurately when layout settles
     const timer1 = setTimeout(() => ScrollTrigger.refresh(), 200);
     const timer2 = setTimeout(() => ScrollTrigger.refresh(), 800);
 

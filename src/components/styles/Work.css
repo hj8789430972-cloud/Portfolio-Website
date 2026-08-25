@@ -41,19 +41,9 @@
 .work-flex .work-box:nth-child(even) {
   flex-direction: column-reverse;
 }
-.work-flex::before,
-.work-flex::after {
-  content: "";
-  width: calc(50000vw);
-  height: 1px;
-  background-color: #363636;
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-}
-.work-flex::after {
-  top: 100%;
+.work-flex {
+  border-top: 1px solid #363636;
+  border-bottom: 1px solid #363636;
 }
 .work-title {
   justify-content: space-between;

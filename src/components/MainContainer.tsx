@@ -14,20 +14,27 @@ const TechStack = lazy(() => import("./TechStack"));
 
 const MainContainer = ({ children }: PropsWithChildren) => {
   const [isDesktopView, setIsDesktopView] = useState<boolean>(
-    window.innerWidth > 1024
+    typeof window !== "undefined" ? window.innerWidth > 1024 : true
   );
 
   useEffect(() => {
+    let resizeTimer: ReturnType<typeof setTimeout>;
+
     const resizeHandler = () => {
-      setSplitText();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setSplitText();
+      }, 100);
       setIsDesktopView(window.innerWidth > 1024);
     };
-    resizeHandler();
+
+    setSplitText();
     window.addEventListener("resize", resizeHandler);
     return () => {
+      clearTimeout(resizeTimer);
       window.removeEventListener("resize", resizeHandler);
     };
-  }, [isDesktopView]);
+  }, []);
 
   return (
     <div className="container-main">
@@ -43,7 +50,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
             <WhatIDo />
             <Career />
             <Work />
-            <Suspense fallback={<div style={{ minHeight: "100vh" }}></div>}>
+            <Suspense fallback={<div className="techstack-section" style={{ minHeight: "60vh" }}></div>}>
               <TechStack />
             </Suspense>
             <Contact />

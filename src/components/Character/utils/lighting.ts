@@ -27,13 +27,16 @@ const setLighting = (scene: THREE.Scene) => {
       scene.environmentRotation.set(5.76, 85.85, 1);
     });
 
-  function setPointLight(screenLight: any) {
-    if (screenLight.material.opacity > 0.9) {
-      pointLight.intensity = screenLight.material.emissiveIntensity * 20;
+  function setPointLight(screenLight: THREE.Mesh | null) {
+    if (!screenLight) return;
+    const material = screenLight.material as THREE.MeshStandardMaterial;
+    if (material && material.opacity > 0.9) {
+      pointLight.intensity = material.emissiveIntensity * 20;
     } else {
       pointLight.intensity = 0;
     }
   }
+
   const duration = 2;
   const ease = "power2.inOut";
   function turnOnLights() {

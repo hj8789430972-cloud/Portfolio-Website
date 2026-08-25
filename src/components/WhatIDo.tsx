@@ -7,23 +7,28 @@ const WhatIDo = () => {
   const setRef = (el: HTMLDivElement | null, index: number) => {
     containerRef.current[index] = el;
   };
+
   useEffect(() => {
+    const containers = containerRef.current.slice();
+    const handlers: { container: HTMLDivElement; handler: () => void }[] = [];
+
     if (ScrollTrigger.isTouch) {
-      containerRef.current.forEach((container) => {
+      containers.forEach((container) => {
         if (container) {
           container.classList.remove("what-noTouch");
-          container.addEventListener("click", () => handleClick(container));
+          const handler = () => handleClick(container);
+          container.addEventListener("click", handler);
+          handlers.push({ container, handler });
         }
       });
     }
     return () => {
-      containerRef.current.forEach((container) => {
-        if (container) {
-          container.removeEventListener("click", () => handleClick(container));
-        }
+      handlers.forEach(({ container, handler }) => {
+        container.removeEventListener("click", handler);
       });
     };
   }, []);
+
   return (
     <div className="whatIDO">
       <div className="what-box">
